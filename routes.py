@@ -1,7 +1,7 @@
 from app.models import User, Post, Message
 from flask import render_template, url_for, flash, redirect, request, abort
 from app import app, db, bcrypt, socketio
-from app.forms import RegistrationForm, LoginForm, UpdateAccount, PostForm
+from app.forms import RegistrationForm, LoginForm, UpdateAccount, PostForm, ChatForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_socketio import send
 '''from PIL import Image'''
@@ -157,11 +157,23 @@ def handler(json, methods=['GET'], ['POST']):
 '''
 
 
-@app.route("/chat.html")
+@app.route("/chat", methods=['POST', 'GET'])
 @login_required
-def display():
+def display(receiver = None):
     userlist = User.query.all()
-    return render_template('chat.html', userlist=userlist)
+    messages = []
+    receiver = request.args.get('receiver')
+
+    form = ChatForm()
+    if form.validate_on_submit():
+        message = Message(sender=current_user, msg_content=form.content.data, )
+        db.session.add(message)
+        db.session.commit()
+    elif receiver is not None:
+        messages = Message.query.filter_by(receiver=receiver,
+                                           sender=current_user.username).order_by(Message.date_sended)
+
+    return render_template('chat.html', userlist=userlist, form=form, messages=messages)
 
 '''
 @app.route("/chat.html/<int:pair_id>", methods=['POST', 'GET'])
