@@ -160,6 +160,7 @@ def handler(json, methods=['GET'], ['POST']):
 @app.route("/chat", methods=['POST', 'GET'])
 @login_required
 def display(receiver = None):
+    #user_chosen
     userlist = User.query.all()
     messages = []
     receiver = request.args.get('receiver')
@@ -171,7 +172,7 @@ def display(receiver = None):
         db.session.commit()
     elif receiver is not None:
         messages = Message.query.filter_by(receiver=receiver,
-                                           sender=current_user.username).order_by(Message.date_sended)
+                                           sender=current_user).order_by(Message.date_sended)
 
     return render_template('chat.html', userlist=userlist, form=form, messages=messages)
 

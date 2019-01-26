@@ -62,3 +62,4 @@ class PostForm(FlaskForm):
 
 class ChatForm(FlaskForm):
     content = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Send')
