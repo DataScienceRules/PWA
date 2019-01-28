@@ -5,6 +5,7 @@ from app import app, db, bcrypt, socketio, user_session_ids
 from app.forms import RegistrationForm, LoginForm, UpdateAccount, PostForm, ChatForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_socketio import SocketIO, send
+
 '''from PIL import Image'''
 import secrets
 import os
@@ -153,7 +154,7 @@ def delete_post(post_id):
 def display():
     form = ChatForm()
     userlist = User.query.all()
-
+    from operator import attrgetter
     messages = Message.query.order_by(Message.date_sended)
     return render_template('chat.html', userlist=userlist, form=form, messages=messages)
 

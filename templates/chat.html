@@ -45,10 +45,12 @@
 
     $(document).ready(function() {
         var socket = io.connect('http://' + document.domain + ":" + location.port);
+
         socket.on('connect', function() {
         });
-        socket.on('message', function(msg) {
-            $("#messages").append('<div style="border-style: groove">'+msg+'</div>');
+        socket.on('message', function(msg,username) {
+
+            $("#messages").append('<div class="article-metadata"><p class="text-muted">'+username+'<p><p>'+msg+'</p> </div>');
             console.log('Received message');
         });
         $('#sendButton').on('click', function() {
@@ -58,10 +60,10 @@
     });
     </script>
 
-    <div id="chat" class="slider" style="border-style: groove">
+    <div class="media content-section" id="chat" style="border-style: groove; overflow-y:scroll; height:400px;">
         <ul id="messages">
             {% for msg in messages %}
-                <div style="border-style: groove"><p class="text-muted">{{ msg.date_sended.strftime('%H:%M') }} {{ msg.sender }}</p>{{msg.msg_content }}<br/></div>
+                <div class="article-metadata"><p class="text-muted">{{ msg.date_sended.strftime('%H:%M') }} {{ msg.sender }}</p>{{msg.msg_content }}<br/></div>
             {% endfor %}
         </ul>
     </div>
