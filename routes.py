@@ -1,9 +1,10 @@
+from tkinter import Image
 from app.models import User, Post, Message
-from flask import render_template, url_for, flash, redirect, request, abort
-from app import app, db, bcrypt, socketio
+from flask import Flask, render_template, url_for, flash, redirect, request, abort, session
+from app import app, db, bcrypt, socketio, user_session_ids
 from app.forms import RegistrationForm, LoginForm, UpdateAccount, PostForm, ChatForm
 from flask_login import login_user, current_user, logout_user, login_required
-from flask_socketio import send
+from flask_socketio import SocketIO, send
 '''from PIL import Image'''
 import secrets
 import os
@@ -69,11 +70,9 @@ def save_picture(form_picture):
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
     picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
-    '''
     output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
-    '''
     form_picture.save(picture_path)
 
     return picture_fn
@@ -149,32 +148,37 @@ def delete_post(post_id):
     return redirect(url_for('home'))
 
 
-'''
-@socketio.on("message")
-def handler(json, methods=['GET'], ['POST']):
-    print('Message: ' + str(json))
-    socketio.emit('my response', json, callback=message_received)
-'''
-
-
 @app.route("/chat", methods=['POST', 'GET'])
 @login_required
-def display(receiver = None):
-    #user_chosen
-    userlist = User.query.all()
-    messages = []
-    receiver = request.args.get('receiver')
-
+def display():
     form = ChatForm()
+    userlist = User.query.all()
+
+    messages = Message.query.order_by(Message.date_sended)
+    return render_template('chat.html', userlist=userlist, form=form, messages=messages)
+
+'''
+    
     if form.validate_on_submit():
         message = Message(sender=current_user, msg_content=form.content.data, )
         db.session.add(message)
         db.session.commit()
     elif receiver is not None:
-        messages = Message.query.filter_by(receiver=receiver,
-                                           sender=current_user).order_by(Message.date_sended)
+        '''
 
-    return render_template('chat.html', userlist=userlist, form=form, messages=messages)
+'''
+
+'''
+@login_required
+@socketio.on('message')
+def handle_message(msg):
+    print('Message: ' + msg)
+
+    message = Message(msg_content=msg, receiver="all", sender=current_user.username)
+    db.session.add(message)
+    db.session.commit()
+
+    send(msg, broadcast=True)
 
 '''
 @app.route("/chat.html/<int:pair_id>", methods=['POST', 'GET'])
@@ -186,22 +190,6 @@ def init_conv(pair_id):
 
 #def message_received(methods=['GET','POST']):
     #print('Message war received')
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@sio.on('connect')
-def connect(sid, environ):
-    print('message', sid)
-    
-@sio.on('my message')
-def message(sid, data):
-    print('message', data)
-    
-@sio.on('disconnect')
-def disconnect(sid):
-    print('disconnect', sid)
     '''
 
 

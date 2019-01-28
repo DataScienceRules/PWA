@@ -34,7 +34,6 @@ class Post(db.Model):
 
 class Message(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True)
-    pair_id = db.Column(db.String(40), nullable=False, unique=True)
     sender = db.Column(db.String(20), nullable=False)
     receiver = db.Column(db.String(20), nullable=False)
     date_sended = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

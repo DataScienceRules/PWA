@@ -1,4 +1,4 @@
-import React from 'react';
+import React, from 'react';
 import ReactDOM
 import app from app;
 
